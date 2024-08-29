@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const config = require('./config'); // Uvoz config fajla
-//test
+
 const app = express();
 const port = 3000;
 
@@ -31,15 +31,23 @@ const User = mongoose.model('User', userSchema);
 app.post('/createUser', async (req, res) => {
   const { type, firstName, lastName, email, age } = req.body;
 
-  const newUser = new User({
-    type: type,
-    firstName: firstName,
-    lastName: lastName,
-    email: email,
-    age: age,
-  });
-
   try {
+    // Provera da li već postoji korisnik sa datim emailom
+    const existingUser = await User.findOne({ email: email });
+
+    if (existingUser) {
+      return res.status(400).json({ message: `User with email ${email} already exists` });
+    }
+
+    // Ako ne postoji, kreira se novi korisnik
+    const newUser = new User({
+      type: type,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      age: age,
+    });
+
     await newUser.save();
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
