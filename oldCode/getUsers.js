@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const config = require('./config'); // Uvoz config fajla
+const config = require('../config'); // Uvoz config fajla
 
 const app = express();
 const port = 3000;
