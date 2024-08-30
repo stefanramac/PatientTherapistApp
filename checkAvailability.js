@@ -34,7 +34,7 @@ const availabilitySchema = new mongoose.Schema({
   ],
 });
 
-const Availability = mongoose.model('Availability', availabilitySchema, 'therapist_availability');
+const Availability = mongoose.model('Availability', availabilitySchema, 'therapist_unavailability');
 
 // Ruta za proveru dostupnosti terapeuta prema therapistId
 app.post('/checkAvailability', async (req, res) => {
