@@ -121,3 +121,15 @@ nav ul li a {
     border-radius: 5px;
     font-size: 14px;
 }
+
+#therapistTable th, #therapistTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#therapistTable th {
+    background-color: #f4f4f4;
+    color: #333;
+    font-weight: bold;
+}
