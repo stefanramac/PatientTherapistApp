@@ -4,13 +4,13 @@ const bodyParser = require('body-parser');
 const config = require('./config'); // Uvoz config fajla
 
 const app = express();
-const port = 3000; // Postavljen drugi port kako bi se izbegli konflikti
+const port = 3006; // Postavljen drugi port kako bi se izbegli konflikti
 
 app.use(bodyParser.json());
 
 mongoose.connect(config.mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  //useNewUrlParser: true,
+  //seUnifiedTopology: true,
 });
 
 mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));

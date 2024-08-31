@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const config = require('./config'); // Uvoz config fajla
 
 const app = express();
-const port = 3000; // Koristimo drugi port da izbegnemo konflikte
+const port = 3002; // Koristimo drugi port da izbegnemo konflikte
 
 app.use(bodyParser.json());
 
