@@ -9,13 +9,11 @@ const port = 3003; // Postavljen drugi port kako bi se izbegli konflikti
 app.use(bodyParser.json());
 
 mongoose.connect(config.mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    writeConcern: {
-      w: "majority",
-      wtimeout: 1000
-    }
-  });
+  writeConcern: {
+    w: "majority",
+    wtimeout: 1000
+  }
+});
 
 mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
 mongoose.connection.once('open', () => {

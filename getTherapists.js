@@ -9,8 +9,6 @@ const port = 3005; // Postavljen drugi port kako bi se izbegli konflikti
 app.use(bodyParser.json());
 
 mongoose.connect(config.mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   writeConcern: {
     w: "majority",
     wtimeout: 1000
