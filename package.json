@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "concurrently \"nodemon insertTimeSlot.js\" \"nodemon deleteTimeSlot.js\""
-    },
+        "start": "concurrently \"nodemon createPatient.js\" \"nodemon createTherapist.js\" \"nodemon checkAvailability.js\" \"nodemon deleteTimeSlot.js\" \"nodemon getPatients.js\" \"nodemon getTherapists.js\" \"nodemon insertTimeSlot.js\""
+        },
     "dependencies": {
         "express": "^4.17.1",
         "mongoose": "^5.12.3"
