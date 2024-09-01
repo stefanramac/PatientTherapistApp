@@ -1,11 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Importing CORS package
 const config = require('./config'); // Uvoz config fajla
 
 const app = express();
 const port = 3000; // Postavljen drugi port kako bi se izbegli konflikti
 
+app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
 
 mongoose.connect(config.mongoURI, {
