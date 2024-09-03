@@ -2,10 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors'); // Importing CORS package
-const config = require('./config'); // Uvoz config fajla
+const config = require('./config'); // Importing config file
 
 const app = express();
-const port = 3008; // Postavljen drugi port kako bi se izbegli konflikti
+const port = 3008; // Assigned port to avoid conflicts
 
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
@@ -22,7 +22,7 @@ mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
-// Definisanje šeme za dostupnost terapeuta
+// Defining the schema for therapist availability
 const therapistAvailabilitySchema = new mongoose.Schema({
   therapistId: String,
   availability: [
@@ -40,19 +40,19 @@ const therapistAvailabilitySchema = new mongoose.Schema({
 
 const TherapistAvailability = mongoose.model('TherapistAvailability', therapistAvailabilitySchema, 'therapist_availability');
 
-// Ruta za brisanje radnog vremena terapeuta
-app.post('/deleteTherapistWorkTime', async (req, res) => {
+// Route for deleting therapist work time
+app.delete('/deleteTherapistWorkTime', async (req, res) => {
   const { therapistId, date, time_slots } = req.body;
 
   try {
-    // Pronađi dostupnost terapeuta u tabeli therapist_availability
+    // Find therapist availability in the therapist_availability table
     const therapistAvailability = await TherapistAvailability.findOne({ therapistId: therapistId });
 
     if (!therapistAvailability) {
       return res.status(404).json({ message: `No availability found for therapist with ID ${therapistId}` });
     }
 
-    // Pronađi odgovarajući datum u availability nizu
+    // Find the corresponding date in the availability array
     let availabilityEntry = therapistAvailability.availability.find(entry => entry.date === date);
 
     if (!availabilityEntry) {
@@ -60,7 +60,7 @@ app.post('/deleteTherapistWorkTime', async (req, res) => {
     }
 
     if (time_slots) {
-      // Ako su specificirani time_slots, proveri da li postoje pre nego što ih obrišeš
+      // If time_slots are specified, check if they exist before deleting them
       const nonExistingSlots = time_slots.filter(slotToDelete =>
         !availabilityEntry.time_slots.some(existingSlot =>
           slotToDelete.start === existingSlot.start && slotToDelete.end === existingSlot.end
@@ -71,23 +71,23 @@ app.post('/deleteTherapistWorkTime', async (req, res) => {
         return res.status(404).json({ message: 'One or more time slots do not exist', nonExistingSlots });
       }
 
-      // Obriši postojeće slotove
+      // Delete existing slots
       availabilityEntry.time_slots = availabilityEntry.time_slots.filter(existingSlot =>
         !time_slots.some(slotToDelete =>
           slotToDelete.start === existingSlot.start && slotToDelete.end === existingSlot.end
         )
       );
 
-      // Ako više nema slotova za taj datum, obriši ceo datum
+      // If there are no more slots for that date, delete the entire date
       if (availabilityEntry.time_slots.length === 0) {
         therapistAvailability.availability = therapistAvailability.availability.filter(entry => entry.date !== date);
       }
     } else {
-      // Ako nisu specificirani time_slots, obriši ceo datum
+      // If time_slots are not specified, delete the entire date
       therapistAvailability.availability = therapistAvailability.availability.filter(entry => entry.date !== date);
     }
 
-    // Sačuvaj promene
+    // Save changes
     await therapistAvailability.save();
 
     res.status(200).json({ message: 'Work time deleted successfully', availability: therapistAvailability });
