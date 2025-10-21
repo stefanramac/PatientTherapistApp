@@ -1,3 +1,7 @@
+require('dotenv').config();
+
 module.exports = {
-  mongoURI: 'mongodb+srv://mindloo:mindLooTest123@mindloocluster0.dqqvn.mongodb.net/MindLooDatabase?retryWrites=true&w=majority&appName=MindLooCluster0',
+  mongoURI: process.env.MONGODB_URI || 'mongodb://localhost:27017/mindloo',
+  port: process.env.PORT || 3000,
+  nodeEnv: process.env.NODE_ENV || 'development',
 };

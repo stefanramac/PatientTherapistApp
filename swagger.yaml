@@ -1,0 +1,1650 @@
+openapi: 3.0.0
+info:
+  title: MindLoo API
+  version: 2.0.0
+  description: |
+    Complete RESTful API for managing patients, therapists, appointments, and therapy-related operations.
+    
+    ## Features
+    - Patient and Therapist Management
+    - Appointment Scheduling
+    - Therapy Session Tracking
+    - Medical Records Management
+    - Secure Messaging System
+    - Review and Rating System
+    - Treatment Planning and Goal Tracking
+    
+  contact:
+    name: Stefan Ramač
+    url: https://www.linkedin.com/in/stefanramac
+  
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+tags:
+  - name: Patients
+    description: Patient management operations
+  - name: Therapists
+    description: Therapist management operations
+  - name: Appointments
+    description: Appointment scheduling and management
+  - name: Availability
+    description: Therapist availability management
+  - name: Sessions
+    description: Therapy session notes and tracking
+  - name: Medical Records
+    description: Patient medical history and records
+  - name: Messages
+    description: Communication between patients and therapists
+  - name: Reviews
+    description: Therapist reviews and ratings
+  - name: Treatment Plans
+    description: Patient treatment plans and goals
+  - name: System
+    description: System health and status
+
+components:
+  schemas:
+    # Patient Schema
+    Patient:
+      type: object
+      required:
+        - patientId
+        - firstName
+        - lastName
+        - email
+      properties:
+        patientId:
+          type: string
+          example: "P001"
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        profile:
+          type: object
+          properties:
+            age:
+              type: integer
+              example: 30
+            gender:
+              type: string
+              example: "male"
+        contactInfo:
+          type: object
+          properties:
+            phone:
+              type: string
+              example: "+1234567890"
+            address:
+              type: string
+              example: "123 Main St"
+            place:
+              type: string
+              example: "New York"
+            country:
+              type: string
+              example: "USA"
+    
+    # Therapist Schema
+    Therapist:
+      type: object
+      required:
+        - therapistId
+        - firstName
+        - lastName
+        - email
+      properties:
+        therapistId:
+          type: string
+          example: "T001"
+        firstName:
+          type: string
+          example: "Jane"
+        lastName:
+          type: string
+          example: "Smith"
+        email:
+          type: string
+          format: email
+          example: "jane.smith@mindloo.com"
+        type:
+          type: string
+          default: "therapist"
+        profile:
+          type: object
+          properties:
+            age:
+              type: integer
+              example: 35
+            gender:
+              type: string
+              example: "female"
+            specialization:
+              type: string
+              example: "Cognitive Behavioral Therapy"
+            experience:
+              type: integer
+              example: 10
+        contactInfo:
+          type: object
+          properties:
+            phone:
+              type: string
+            address:
+              type: string
+            place:
+              type: string
+            country:
+              type: string
+    
+    # Appointment Schema
+    Appointment:
+      type: object
+      required:
+        - therapistId
+        - patientId
+        - date
+        - timeSlot
+      properties:
+        appointmentId:
+          type: string
+          readOnly: true
+        therapistId:
+          type: string
+          example: "T001"
+        patientId:
+          type: string
+          example: "P001"
+        date:
+          type: string
+          format: date
+          example: "2025-10-25"
+        timeSlot:
+          type: object
+          required:
+            - start
+            - end
+          properties:
+            start:
+              type: string
+              example: "10:00"
+            end:
+              type: string
+              example: "11:00"
+        status:
+          type: string
+          enum: [scheduled, completed, cancelled, rescheduled]
+          default: scheduled
+        subject:
+          type: string
+          example: "Initial consultation"
+        notes:
+          type: string
+    
+    # Availability Schema
+    TherapistAvailability:
+      type: object
+      required:
+        - date
+        - time_slots
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2025-10-25"
+        time_slots:
+          type: array
+          items:
+            type: object
+            properties:
+              start:
+                type: string
+                example: "09:00"
+              end:
+                type: string
+                example: "17:00"
+    
+    # Session Schema
+    Session:
+      type: object
+      required:
+        - appointmentId
+        - therapistId
+        - patientId
+        - sessionDate
+        - duration
+      properties:
+        sessionId:
+          type: string
+          readOnly: true
+        appointmentId:
+          type: string
+        therapistId:
+          type: string
+        patientId:
+          type: string
+        sessionDate:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          description: Duration in minutes
+          example: 60
+        sessionType:
+          type: string
+          enum: [initial, follow-up, emergency, final]
+          default: follow-up
+        notes:
+          type: object
+          properties:
+            symptoms:
+              type: string
+            observations:
+              type: string
+            interventions:
+              type: string
+            homework:
+              type: string
+            progressNotes:
+              type: string
+        mood:
+          type: object
+          properties:
+            before:
+              type: integer
+              minimum: 1
+              maximum: 10
+            after:
+              type: integer
+              minimum: 1
+              maximum: 10
+        goals:
+          type: array
+          items:
+            type: string
+        isCompleted:
+          type: boolean
+          default: false
+    
+    # Medical Record Schema
+    MedicalRecord:
+      type: object
+      required:
+        - patientId
+        - recordType
+        - title
+        - addedBy
+      properties:
+        recordId:
+          type: string
+          readOnly: true
+        patientId:
+          type: string
+        recordType:
+          type: string
+          enum: [diagnosis, medication, allergy, lab-result, history, other]
+        title:
+          type: string
+        description:
+          type: string
+        diagnosis:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "F41.1"
+            name:
+              type: string
+              example: "Generalized Anxiety Disorder"
+            severity:
+              type: string
+              enum: [mild, moderate, severe]
+        medications:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              dosage:
+                type: string
+              frequency:
+                type: string
+              startDate:
+                type: string
+                format: date
+              endDate:
+                type: string
+                format: date
+        allergies:
+          type: array
+          items:
+            type: object
+            properties:
+              allergen:
+                type: string
+              reaction:
+                type: string
+              severity:
+                type: string
+                enum: [mild, moderate, severe, life-threatening]
+        addedBy:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    
+    # Message Schema
+    Message:
+      type: object
+      required:
+        - senderId
+        - senderType
+        - receiverId
+        - receiverType
+        - content
+      properties:
+        messageId:
+          type: string
+          readOnly: true
+        conversationId:
+          type: string
+        senderId:
+          type: string
+        senderType:
+          type: string
+          enum: [patient, therapist]
+        receiverId:
+          type: string
+        receiverType:
+          type: string
+          enum: [patient, therapist]
+        subject:
+          type: string
+        content:
+          type: string
+        messageType:
+          type: string
+          enum: [text, appointment-request, prescription, document, emergency]
+          default: text
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+          default: normal
+        isRead:
+          type: boolean
+          default: false
+    
+    # Review Schema
+    Review:
+      type: object
+      required:
+        - therapistId
+        - patientId
+        - rating
+      properties:
+        reviewId:
+          type: string
+          readOnly: true
+        therapistId:
+          type: string
+        patientId:
+          type: string
+        appointmentId:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        categories:
+          type: object
+          properties:
+            professionalism:
+              type: integer
+              minimum: 1
+              maximum: 5
+            communication:
+              type: integer
+              minimum: 1
+              maximum: 5
+            effectiveness:
+              type: integer
+              minimum: 1
+              maximum: 5
+            empathy:
+              type: integer
+              minimum: 1
+              maximum: 5
+        comment:
+          type: string
+        isAnonymous:
+          type: boolean
+          default: false
+        isVerified:
+          type: boolean
+          default: false
+    
+    # Treatment Plan Schema
+    TreatmentPlan:
+      type: object
+      required:
+        - patientId
+        - therapistId
+        - title
+        - startDate
+      properties:
+        planId:
+          type: string
+          readOnly: true
+        patientId:
+          type: string
+        therapistId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        diagnosis:
+          type: object
+          properties:
+            primary:
+              type: string
+            secondary:
+              type: array
+              items:
+                type: string
+        goals:
+          type: array
+          items:
+            type: object
+            properties:
+              goalId:
+                type: string
+              description:
+                type: string
+              targetDate:
+                type: string
+                format: date
+              status:
+                type: string
+                enum: [not-started, in-progress, achieved, abandoned]
+              progress:
+                type: integer
+                minimum: 0
+                maximum: 100
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [active, completed, on-hold, cancelled]
+          default: active
+    
+    # Error Response
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+
+paths:
+  # Health Check
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check endpoint
+      description: Check server and database connection status
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  database:
+                    type: string
+                    example: "Connected"
+  
+  # Patients Endpoints
+  /api/patients:
+    post:
+      tags:
+        - Patients
+      summary: Create a new patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+      responses:
+        '201':
+          description: Patient created successfully
+        '400':
+          description: Patient already exists
+        '500':
+          description: Server error
+    
+    get:
+      tags:
+        - Patients
+      summary: Get all patients
+      responses:
+        '200':
+          description: List of patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Patient'
+        '500':
+          description: Server error
+  
+  /api/patients/{id}:
+    get:
+      tags:
+        - Patients
+      summary: Get patient by ID or email
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Patient ID or email
+      responses:
+        '200':
+          description: Patient data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '404':
+          description: Patient not found
+    
+    patch:
+      tags:
+        - Patients
+      summary: Update patient information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+      responses:
+        '200':
+          description: Patient updated successfully
+        '404':
+          description: Patient not found
+    
+    delete:
+      tags:
+        - Patients
+      summary: Delete a patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Patient deleted successfully
+        '404':
+          description: Patient not found
+  
+  # Therapists Endpoints
+  /api/therapists:
+    post:
+      tags:
+        - Therapists
+      summary: Create a new therapist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Therapist'
+      responses:
+        '201':
+          description: Therapist created successfully
+        '400':
+          description: Therapist already exists
+    
+    get:
+      tags:
+        - Therapists
+      summary: Get all therapists
+      responses:
+        '200':
+          description: List of therapists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Therapist'
+  
+  /api/therapists/{id}:
+    get:
+      tags:
+        - Therapists
+      summary: Get therapist by ID or email
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Therapist data
+        '404':
+          description: Therapist not found
+    
+    patch:
+      tags:
+        - Therapists
+      summary: Update therapist information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Therapist'
+      responses:
+        '200':
+          description: Therapist updated successfully
+    
+    delete:
+      tags:
+        - Therapists
+      summary: Delete a therapist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Therapist deleted successfully
+  
+  # Appointments Endpoints
+  /api/appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Create a new appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+      responses:
+        '201':
+          description: Appointment created successfully
+        '400':
+          description: Time slot not available
+    
+    get:
+      tags:
+        - Appointments
+      summary: Get appointments with filters
+      parameters:
+        - name: therapistId
+          in: query
+          schema:
+            type: string
+        - name: patientId
+          in: query
+          schema:
+            type: string
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, completed, cancelled, rescheduled]
+      responses:
+        '200':
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Appointment'
+  
+  /api/appointments/{id}:
+    get:
+      tags:
+        - Appointments
+      summary: Get appointment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Appointment data
+        '404':
+          description: Appointment not found
+    
+    patch:
+      tags:
+        - Appointments
+      summary: Update appointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                subject:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Appointment updated successfully
+    
+    delete:
+      tags:
+        - Appointments
+      summary: Delete an appointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Appointment deleted successfully
+  
+  # Availability Endpoints
+  /api/therapists/{therapistId}/availability:
+    get:
+      tags:
+        - Availability
+      summary: Get therapist availability
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Therapist availability data
+        '404':
+          description: No availability found
+    
+    post:
+      tags:
+        - Availability
+      summary: Add therapist working hours
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TherapistAvailability'
+      responses:
+        '200':
+          description: Working hours added successfully
+        '201':
+          description: New availability created
+    
+    delete:
+      tags:
+        - Availability
+      summary: Delete therapist working hours
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TherapistAvailability'
+      responses:
+        '200':
+          description: Working hours deleted successfully
+  
+  /api/therapists/{therapistId}/unavailability:
+    get:
+      tags:
+        - Availability
+      summary: Get therapist unavailability (booked slots)
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Therapist unavailability data
+        '404':
+          description: No unavailability found
+    
+    post:
+      tags:
+        - Availability
+      summary: Add unavailable time slots
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TherapistAvailability'
+      responses:
+        '200':
+          description: Unavailable slots added successfully
+    
+    delete:
+      tags:
+        - Availability
+      summary: Delete unavailable time slots
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TherapistAvailability'
+      responses:
+        '200':
+          description: Unavailable slots deleted successfully
+  
+  # Sessions Endpoints
+  /api/sessions:
+    post:
+      tags:
+        - Sessions
+      summary: Create a new therapy session record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Session'
+      responses:
+        '201':
+          description: Session created successfully
+    
+    get:
+      tags:
+        - Sessions
+      summary: Get sessions with filters
+      parameters:
+        - name: therapistId
+          in: query
+          schema:
+            type: string
+        - name: patientId
+          in: query
+          schema:
+            type: string
+        - name: appointmentId
+          in: query
+          schema:
+            type: string
+        - name: sessionType
+          in: query
+          schema:
+            type: string
+            enum: [initial, follow-up, emergency, final]
+        - name: isCompleted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+  
+  /api/sessions/{id}:
+    get:
+      tags:
+        - Sessions
+      summary: Get session by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session data
+        '404':
+          description: Session not found
+    
+    patch:
+      tags:
+        - Sessions
+      summary: Update session information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Session'
+      responses:
+        '200':
+          description: Session updated successfully
+    
+    delete:
+      tags:
+        - Sessions
+      summary: Delete a session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session deleted successfully
+  
+  /api/sessions/patient/{patientId}/progress:
+    get:
+      tags:
+        - Sessions
+      summary: Get patient progress over time
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Patient progress data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalSessions:
+                    type: integer
+                  moodProgress:
+                    type: array
+                    items:
+                      type: object
+                  averageImprovement:
+                    type: number
+  
+  # Medical Records Endpoints
+  /api/medical-records:
+    post:
+      tags:
+        - Medical Records
+      summary: Create a new medical record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalRecord'
+      responses:
+        '201':
+          description: Medical record created successfully
+  
+  /api/medical-records/patient/{patientId}:
+    get:
+      tags:
+        - Medical Records
+      summary: Get all medical records for a patient
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: recordType
+          in: query
+          schema:
+            type: string
+            enum: [diagnosis, medication, allergy, lab-result, history, other]
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of medical records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MedicalRecord'
+  
+  /api/medical-records/{id}:
+    get:
+      tags:
+        - Medical Records
+      summary: Get medical record by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Medical record data
+        '404':
+          description: Record not found
+    
+    patch:
+      tags:
+        - Medical Records
+      summary: Update medical record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalRecord'
+      responses:
+        '200':
+          description: Medical record updated successfully
+    
+    delete:
+      tags:
+        - Medical Records
+      summary: Delete a medical record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Medical record deleted successfully
+  
+  /api/medical-records/patient/{patientId}/summary:
+    get:
+      tags:
+        - Medical Records
+      summary: Get medical summary for a patient
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Patient medical summary
+  
+  # Messages Endpoints
+  /api/messages:
+    post:
+      tags:
+        - Messages
+      summary: Send a new message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '201':
+          description: Message sent successfully
+  
+  /api/messages/conversation/{conversationId}:
+    get:
+      tags:
+        - Messages
+      summary: Get all messages in a conversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+  
+  /api/messages/user/{userId}:
+    get:
+      tags:
+        - Messages
+      summary: Get all conversations for a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of conversations
+  
+  /api/messages/{id}:
+    get:
+      tags:
+        - Messages
+      summary: Get message by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message data
+        '404':
+          description: Message not found
+    
+    delete:
+      tags:
+        - Messages
+      summary: Delete a message
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message deleted successfully
+  
+  /api/messages/{id}/read:
+    patch:
+      tags:
+        - Messages
+      summary: Mark message as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message marked as read
+  
+  # Reviews Endpoints
+  /api/reviews:
+    post:
+      tags:
+        - Reviews
+      summary: Create a new review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Review created successfully
+  
+  /api/reviews/therapist/{therapistId}:
+    get:
+      tags:
+        - Reviews
+      summary: Get all reviews for a therapist
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: isVisible
+          in: query
+          schema:
+            type: boolean
+        - name: minRating
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+      responses:
+        '200':
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+  
+  /api/reviews/therapist/{therapistId}/stats:
+    get:
+      tags:
+        - Reviews
+      summary: Get review statistics for a therapist
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalReviews:
+                    type: integer
+                  averageRating:
+                    type: number
+                  ratingDistribution:
+                    type: object
+                  categoryAverages:
+                    type: object
+  
+  /api/reviews/patient/{patientId}:
+    get:
+      tags:
+        - Reviews
+      summary: Get all reviews by a patient
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of reviews
+  
+  /api/reviews/{id}:
+    get:
+      tags:
+        - Reviews
+      summary: Get review by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review data
+        '404':
+          description: Review not found
+    
+    patch:
+      tags:
+        - Reviews
+      summary: Update review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '200':
+          description: Review updated successfully
+    
+    delete:
+      tags:
+        - Reviews
+      summary: Delete a review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review deleted successfully
+  
+  /api/reviews/{id}/respond:
+    patch:
+      tags:
+        - Reviews
+      summary: Add therapist response to review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Response added successfully
+  
+  # Treatment Plans Endpoints
+  /api/treatment-plans:
+    post:
+      tags:
+        - Treatment Plans
+      summary: Create a new treatment plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TreatmentPlan'
+      responses:
+        '201':
+          description: Treatment plan created successfully
+  
+  /api/treatment-plans/patient/{patientId}:
+    get:
+      tags:
+        - Treatment Plans
+      summary: Get all treatment plans for a patient
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, completed, on-hold, cancelled]
+      responses:
+        '200':
+          description: List of treatment plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TreatmentPlan'
+  
+  /api/treatment-plans/therapist/{therapistId}:
+    get:
+      tags:
+        - Treatment Plans
+      summary: Get all treatment plans by a therapist
+      parameters:
+        - name: therapistId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of treatment plans
+  
+  /api/treatment-plans/{id}:
+    get:
+      tags:
+        - Treatment Plans
+      summary: Get treatment plan by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Treatment plan data
+        '404':
+          description: Treatment plan not found
+    
+    patch:
+      tags:
+        - Treatment Plans
+      summary: Update treatment plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TreatmentPlan'
+      responses:
+        '200':
+          description: Treatment plan updated successfully
+    
+    delete:
+      tags:
+        - Treatment Plans
+      summary: Delete a treatment plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Treatment plan deleted successfully
+  
+  /api/treatment-plans/{id}/goals/{goalId}:
+    patch:
+      tags:
+        - Treatment Plans
+      summary: Update specific goal in treatment plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [not-started, in-progress, achieved, abandoned]
+                progress:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+      responses:
+        '200':
+          description: Goal updated successfully
+  
+  /api/treatment-plans/{id}/milestones:
+    post:
+      tags:
+        - Treatment Plans
+      summary: Add milestone to treatment plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                targetDate:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Milestone added successfully
+  
+  /api/treatment-plans/patient/{patientId}/progress:
+    get:
+      tags:
+        - Treatment Plans
+      summary: Get overall progress for patient's treatment plans
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Progress data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPlans:
+                    type: integer
+                  activePlans:
+                    type: integer
+                  completedPlans:
+                    type: integer
+                  totalGoals:
+                    type: integer
+                  goalsAchieved:
+                    type: integer
+                  overallProgress:
+                    type: number
+

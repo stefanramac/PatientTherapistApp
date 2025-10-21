@@ -1,18 +1,21 @@
 {
     "name": "MindLooApp",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
+    "version": "2.0.0",
+    "description": "MindLoo - RESTful API for managing patients, therapists, and appointments",
+    "main": "server.js",
     "scripts": {
-    "start": "concurrently \"nodemon createPatient.js\" \"nodemon createTherapist.js\" \"nodemon checkAvailability.js\" \"nodemon deleteTimeSlot.js\" \"nodemon getPatients.js\" \"nodemon getTherapists.js\" \"nodemon insertTimeSlot.js\" \"nodemon deleteTherapistWorkTime.js\" \"nodemon getTherapist.js\" \"nodemon insertTherapistWorkTime.js\" \"nodemon createAppointment.js\" \"nodemon deleteAppointment.js\" \"nodemon getAppointment.js\""
-},
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
     "dependencies": {
         "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
         "express": "^4.17.1",
-        "mongoose": "^8.6.0"
+        "mongoose": "^8.6.0",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.0"
     },
     "devDependencies": {
-        "concurrently": "^5.3.0",
         "nodemon": "^2.0.7"
     }
 }
