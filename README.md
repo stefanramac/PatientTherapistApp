@@ -64,14 +64,35 @@ This provides a complete interactive interface where you can test all API endpoi
 
 ### OpenAPI Specification
 
-The complete OpenAPI 3.0 specification is available in `swagger.yaml`. You can:
+The complete OpenAPI 3.0 specification is available in multiple formats:
 
-1. **Import into Postman**: File → Import → Choose `swagger.yaml`
-2. **Import into Insomnia**: Application → Preferences → Data → Import Data
-3. **Use with code generators**: Generate client SDKs using tools like OpenAPI Generator
-4. **Share with team**: The YAML file serves as API contract documentation
+**Local Files:**
+- `swagger.yaml` - OpenAPI specification in YAML format
 
-**Download:** `swagger.yaml` (located in project root)
+**API Endpoints (when server is running):**
+- **YAML:** http://localhost:3000/api/openapi.yaml
+- **JSON:** http://localhost:3000/api/openapi.json
+
+**Usage:**
+
+1. **Import into Postman**
+   - File → Import → Choose `swagger.yaml` or paste URL
+   - All endpoints will be automatically created with proper schemas
+
+2. **Import into Insomnia**
+   - Application → Preferences → Data → Import Data
+   - Select `swagger.yaml` file
+
+3. **Code Generation**
+   - Use OpenAPI Generator to generate client SDKs
+   - Supports 50+ programming languages
+   ```bash
+   openapi-generator-cli generate -i swagger.yaml -g javascript -o ./client
+   ```
+
+4. **API Documentation**
+   - The YAML file serves as API contract documentation
+   - Can be version controlled and shared with team
 
 ## 🏗️ Project Structure
 

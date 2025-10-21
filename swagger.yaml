@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: MindLoo API
+  title: PatientTherapist API
   version: 2.0.0
   description: |
     Complete RESTful API for managing patients, therapists, appointments, and therapy-related operations.
@@ -858,21 +858,33 @@ paths:
       tags:
         - Availability
       summary: Delete therapist working hours
+      description: |
+        Delete working hours for a therapist. 
+        
+        **Note:** This endpoint accepts data in the request body (date and time_slots to delete),
+        although it's a DELETE operation. When using this API:
+        - Send JSON data with `date` and `time_slots` array in the request body
+        - If `time_slots` is not provided, the entire date will be deleted
+        
+        Example body:
+        ```json
+        {
+          "date": "2025-10-25",
+          "time_slots": [{"start": "09:00", "end": "12:00"}]
+        }
+        ```
       parameters:
         - name: therapistId
           in: path
           required: true
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TherapistAvailability'
+          description: Therapist ID
       responses:
         '200':
           description: Working hours deleted successfully
+        '404':
+          description: Availability not found
   
   /api/therapists/{therapistId}/unavailability:
     get:
@@ -915,21 +927,33 @@ paths:
       tags:
         - Availability
       summary: Delete unavailable time slots
+      description: |
+        Delete unavailable time slots for a therapist.
+        
+        **Note:** This endpoint accepts data in the request body (date and time_slots to delete),
+        although it's a DELETE operation. When using this API:
+        - Send JSON data with `date` and `time_slots` array in the request body
+        - If `time_slots` is not provided, the entire date will be deleted
+        
+        Example body:
+        ```json
+        {
+          "date": "2025-10-25",
+          "time_slots": [{"start": "10:00", "end": "11:00"}]
+        }
+        ```
       parameters:
         - name: therapistId
           in: path
           required: true
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TherapistAvailability'
+          description: Therapist ID
       responses:
         '200':
           description: Unavailable slots deleted successfully
+        '404':
+          description: Unavailability not found
   
   # Sessions Endpoints
   /api/sessions:
