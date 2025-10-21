@@ -1,4 +1,4 @@
-# MindLoo API
+# PatientTherapist API
 
 RESTful API for managing patients, therapists, and appointments.
 
